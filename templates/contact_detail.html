@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Contact Details</h2>
+
+<div class="card">
+
+<div class="card-body">
+
+<h4>{{ contact[1] }}</h4>
+
+<p>
+<strong>Phone:</strong>
+{{ contact[2] }}
+</p>
+
+<p>
+<strong>Email:</strong>
+{{ contact[3] }}
+</p>
+
+</div>
+
+</div>
+
+{% endblock %}

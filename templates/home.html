@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="text-center mt-5">
+
+    <h1 class="display-4">📒 Contact Book</h1>
+
+    <p class="lead mt-3">
+        Manage your contacts easily with this Flask Contact Book application.
+    </p>
+
+    <hr class="my-4">
+
+    <p>
+        Add, view, and organize contact information in one place.
+    </p>
+
+    <div class="mt-4">
+
+        <a href="/contacts" class="btn btn-primary btn-lg me-2">
+            📋 View Contacts
+        </a>
+
+        <a href="/add" class="btn btn-success btn-lg">
+            ➕ Add Contact
+        </a>
+
+    </div>
+
+</div>
+
+<div class="row mt-5">
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h4>➕ Add Contacts</h4>
+                <p>
+                    Save new contacts with name, phone number, and email.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h4>📋 View Contacts</h4>
+                <p>
+                    Browse all saved contacts in a clean table format.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h4>🗑️ Manage Contacts</h4>
+                <p>
+                    View details and remove contacts when no longer needed.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

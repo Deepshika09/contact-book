@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>All Contacts</h2>
+
+<table class="table table-bordered">
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Email</th>
+    <th>Actions</th>
+</tr>
+
+{% for c in contacts %}
+
+<tr>
+    <td>{{ c[0] }}</td>
+    <td>{{ c[1] }}</td>
+    <td>{{ c[2] }}</td>
+    <td>{{ c[3] }}</td>
+
+    <td>
+
+        <a class="btn btn-info btn-sm"
+           href="/contact/{{ c[0] }}">
+            View
+        </a>
+
+        <a class="btn btn-danger btn-sm"
+           href="/delete/{{ c[0] }}">
+            Delete
+        </a>
+
+    </td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}
