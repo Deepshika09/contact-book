@@ -17,20 +17,20 @@
 {% for c in contacts %}
 
 <tr>
-    <td>{{ c[0] }}</td>
-    <td>{{ c[1] }}</td>
-    <td>{{ c[2] }}</td>
-    <td>{{ c[3] }}</td>
+    <td>{{ c.id }}</td>
+    <td>{{ c.name }}</td>
+    <td>{{ c.phone }}</td>
+    <td>{{ c.email }}</td>
 
     <td>
 
         <a class="btn btn-info btn-sm"
-           href="/contact/{{ c[0] }}">
+           href="/contact/{{ c.id }}">
             View
         </a>
 
         <a class="btn btn-danger btn-sm"
-           href="/delete/{{ c[0] }}">
+           href="/delete/{{ c.id }}">
             Delete
         </a>
 

@@ -1,43 +1,37 @@
 from flask import Flask, render_template, request, redirect, url_for
-import sqlite3
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Create database
-def init_db():
-    conn = sqlite3.connect('contacts.db')
-    cur = conn.cursor()
+# Database Configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///contacts.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    cur.execute("""
-    CREATE TABLE IF NOT EXISTS contacts(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        email TEXT NOT NULL
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
-init_db()
+db = SQLAlchemy(app)
 
 
+# Contact Model
+class Contact(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+
+    def __repr__(self):
+        return f"<Contact {self.name}>"
+
+
+# Home Page
 @app.route('/')
 def home():
     return render_template('home.html')
 
 
+# View All Contacts
 @app.route('/contacts')
 def contacts():
 
-    conn = sqlite3.connect('contacts.db')
-    cur = conn.cursor()
-
-    cur.execute("SELECT * FROM contacts")
-    all_contacts = cur.fetchall()
-
-    conn.close()
+    all_contacts = Contact.query.all()
 
     return render_template(
         'contacts.html',
@@ -45,6 +39,7 @@ def contacts():
     )
 
 
+# Add Contact
 @app.route('/add', methods=['GET', 'POST'])
 def add_contact():
 
@@ -54,39 +49,25 @@ def add_contact():
         phone = request.form['phone']
         email = request.form['email']
 
-        conn = sqlite3.connect('contacts.db')
-        cur = conn.cursor()
-
-        cur.execute(
-            """
-            INSERT INTO contacts(name, phone, email)
-            VALUES (?, ?, ?)
-            """,
-            (name, phone, email)
+        new_contact = Contact(
+            name=name,
+            phone=phone,
+            email=email
         )
 
-        conn.commit()
-        conn.close()
+        db.session.add(new_contact)
+        db.session.commit()
 
         return redirect(url_for('contacts'))
 
     return render_template('add_contact.html')
 
 
+# Contact Details
 @app.route('/contact/<int:id>')
 def contact_detail(id):
 
-    conn = sqlite3.connect('contacts.db')
-    cur = conn.cursor()
-
-    cur.execute(
-        "SELECT * FROM contacts WHERE id=?",
-        (id,)
-    )
-
-    contact = cur.fetchone()
-
-    conn.close()
+    contact = Contact.query.get_or_404(id)
 
     return render_template(
         'contact_detail.html',
@@ -94,21 +75,21 @@ def contact_detail(id):
     )
 
 
+# Delete Contact
 @app.route('/delete/<int:id>')
 def delete_contact(id):
 
-    conn = sqlite3.connect('contacts.db')
-    cur = conn.cursor()
+    contact = Contact.query.get_or_404(id)
 
-    cur.execute(
-        "DELETE FROM contacts WHERE id=?",
-        (id,)
-    )
-
-    conn.commit()
-    conn.close()
+    db.session.delete(contact)
+    db.session.commit()
 
     return redirect(url_for('contacts'))
+
+
+# Create Database Tables
+with app.app_context():
+    db.create_all()
 
 
 if __name__ == '__main__':
