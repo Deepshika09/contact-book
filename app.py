@@ -75,6 +75,28 @@ def contact_detail(id):
     )
 
 
+# Edit Contact
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_contact(id):
+
+    contact = Contact.query.get_or_404(id)
+
+    if request.method == 'POST':
+
+        contact.name = request.form['name']
+        contact.phone = request.form['phone']
+        contact.email = request.form['email']
+
+        db.session.commit()
+
+        return redirect(url_for('contacts'))
+
+    return render_template(
+        'edit_contact.html',
+        contact=contact
+    )
+
+
 # Delete Contact
 @app.route('/delete/<int:id>')
 def delete_contact(id):

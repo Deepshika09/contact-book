@@ -6,40 +6,49 @@
 
 <table class="table table-bordered">
 
-<tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Phone</th>
-    <th>Email</th>
-    <th>Actions</th>
-</tr>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
 
-{% for c in contacts %}
+    {% for c in contacts %}
 
-<tr>
-    <td>{{ c.id }}</td>
-    <td>{{ c.name }}</td>
-    <td>{{ c.phone }}</td>
-    <td>{{ c.email }}</td>
+    <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.email }}</td>
 
-    <td>
+        <td>
 
-        <a class="btn btn-info btn-sm"
-           href="/contact/{{ c.id }}">
-            View
-        </a>
+            <a class="btn btn-info btn-sm"
+               href="/contact/{{ c.id }}">
+                View
+            </a>
 
-        <a class="btn btn-danger btn-sm"
-           href="/delete/{{ c.id }}">
-            Delete
-        </a>
+            <a class="btn btn-primary btn-sm"
+               href="/edit/{{ c.id }}">
+                Edit
+            </a>
 
-    </td>
+            <a class="btn btn-danger btn-sm"
+               href="/delete/{{ c.id }}">
+                Delete
+            </a>
 
-</tr>
+        </td>
 
-{% endfor %}
+    </tr>
+
+    {% endfor %}
 
 </table>
+
+<a href="/add" class="btn btn-success">
+    Add New Contact
+</a>
 
 {% endblock %}
