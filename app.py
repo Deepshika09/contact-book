@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+
+app.secret_key = "secret123"
 
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///contacts.db'
@@ -21,15 +23,80 @@ class Contact(db.Model):
         return f"<Contact {self.name}>"
 
 
+# User Model
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
+
 # Home Page
 @app.route('/')
 def home():
     return render_template('home.html')
 
 
+# Register
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+
+    if request.method == 'POST':
+
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User(
+            username=username,
+            password=password
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+
+# Login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+
+        username = request.form['username']
+        password = request.form['password']
+
+        user = User.query.filter_by(
+            username=username,
+            password=password
+        ).first()
+
+        if user:
+
+            session['user_id'] = user.id
+            session['username'] = user.username
+
+            return redirect(url_for('contacts'))
+
+    return render_template('login.html')
+
+
+# Logout
+@app.route('/logout')
+def logout():
+
+    session.clear()
+
+    return redirect(url_for('login'))
+
+
 # View All Contacts
 @app.route('/contacts')
 def contacts():
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
     all_contacts = Contact.query.all()
 
@@ -42,6 +109,9 @@ def contacts():
 # Add Contact
 @app.route('/add', methods=['GET', 'POST'])
 def add_contact():
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
     if request.method == 'POST':
 
@@ -67,6 +137,9 @@ def add_contact():
 @app.route('/contact/<int:id>')
 def contact_detail(id):
 
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
     contact = Contact.query.get_or_404(id)
 
     return render_template(
@@ -78,6 +151,9 @@ def contact_detail(id):
 # Edit Contact
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_contact(id):
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
     contact = Contact.query.get_or_404(id)
 
@@ -100,6 +176,9 @@ def edit_contact(id):
 # Delete Contact
 @app.route('/delete/<int:id>')
 def delete_contact(id):
+
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
 
     contact = Contact.query.get_or_404(id)
 
