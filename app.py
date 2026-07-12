@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -45,6 +45,14 @@ def register():
         username = request.form['username']
         password = request.form['password']
 
+        existing_user = User.query.filter_by(
+            username=username
+        ).first()
+
+        if existing_user:
+            flash("Account already exists. Please login.")
+            return redirect(url_for('login'))
+
         user = User(
             username=username,
             password=password
@@ -53,6 +61,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
+        flash("Registration successful! Please login.")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -77,10 +86,12 @@ def login():
             session['user_id'] = user.id
             session['username'] = user.username
 
+            flash("Login successful!")
             return redirect(url_for('contacts'))
 
-    return render_template('login.html')
+        flash("Invalid username or password.")
 
+    return render_template('login.html')
 
 # Logout
 @app.route('/logout')
@@ -88,6 +99,7 @@ def logout():
 
     session.clear()
 
+    flash("Logged out successfully.")
     return redirect(url_for('login'))
 
 
@@ -96,6 +108,7 @@ def logout():
 def contacts():
 
     if 'user_id' not in session:
+        flash("Please login first.")
         return redirect(url_for('login'))
 
     all_contacts = Contact.query.all()
@@ -111,6 +124,7 @@ def contacts():
 def add_contact():
 
     if 'user_id' not in session:
+        flash("Please login first.")
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -128,6 +142,7 @@ def add_contact():
         db.session.add(new_contact)
         db.session.commit()
 
+        flash("Contact added successfully!")
         return redirect(url_for('contacts'))
 
     return render_template('add_contact.html')
@@ -138,6 +153,7 @@ def add_contact():
 def contact_detail(id):
 
     if 'user_id' not in session:
+        flash("Please login first.")
         return redirect(url_for('login'))
 
     contact = Contact.query.get_or_404(id)
@@ -153,6 +169,7 @@ def contact_detail(id):
 def edit_contact(id):
 
     if 'user_id' not in session:
+        flash("Please login first.")
         return redirect(url_for('login'))
 
     contact = Contact.query.get_or_404(id)
@@ -165,6 +182,7 @@ def edit_contact(id):
 
         db.session.commit()
 
+        flash("Contact updated successfully!")
         return redirect(url_for('contacts'))
 
     return render_template(
@@ -178,6 +196,7 @@ def edit_contact(id):
 def delete_contact(id):
 
     if 'user_id' not in session:
+        flash("Please login first.")
         return redirect(url_for('login'))
 
     contact = Contact.query.get_or_404(id)
@@ -185,6 +204,7 @@ def delete_contact(id):
     db.session.delete(contact)
     db.session.commit()
 
+    flash("Contact deleted successfully!")
     return redirect(url_for('contacts'))
 
 
